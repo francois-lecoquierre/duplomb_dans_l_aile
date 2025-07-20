@@ -9,6 +9,9 @@ on:
     - cron: '*/10 * * * *'  # Toutes les 10 minutes (UTC)
   workflow_dispatch:  # Permet de le lancer manuellement aussi
 
+
+
+
 jobs:
   run-script:
     runs-on: ubuntu-latest
@@ -25,7 +28,17 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: Run loi_duplomb.py
-        run: python loi_duplomb.py
+        run: python loi_duplomb.py signatures.tsv
+
+      - name: Commit updated signatures.tsv if changed
+        run: |
+          git config --local user.name "GitHub Actions"
+          git config --local user.email "actions@github.com"
+          git add signatures.tsv
+          git diff --cached --quiet || git commit -m "Update signatures.tsv"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload output files
         uses: actions/upload-artifact@v4
@@ -33,15 +46,6 @@ jobs:
           name: output-files
           path: |
             signatures.tsv
-            signatures_plot.png
-
-      - name: Commit signatures.tsv
-        run: |
-          git config --local user.name "GitHub Actions"
-          git config --local user.email "actions@github.com"
-          git add signatures.tsv
-          git commit -m "Update signatures.tsv"
-          git push
 
 
 
