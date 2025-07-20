@@ -4,6 +4,7 @@ import requests
 import time
 import matplotlib.pyplot as plt
 from matplotlib.ticker import ScalarFormatter
+import matplotlib.dates as mdates
 from bs4 import BeautifulSoup
 from datetime import datetime
 import csv
@@ -137,6 +138,22 @@ def plot_data_2():
     ax2.grid(True)
     # Y from 0 to max + 10%
     ax2.set_ylim(0, df['signatures_per_seconde_since_last_point'].max() * 1.1)
+
+
+    # Pour les deux graphes, on ajoute une ligne verticale en pointillés à chaque changement de jour
+    # Détermination des jours uniques
+    start = df['timestamp'].dt.date.min()
+    end = df['timestamp'].dt.date.max()
+    
+    jours_uniques = pd.date_range(start=start, end=end, freq='D')
+
+    # Ajout de lignes verticales à chaque minuit
+    color = "red"
+    linestyle = "--"
+    alpha = 0.5
+    for jour in jours_uniques:
+        ax1.axvline(x=pd.Timestamp(jour), color=color, linestyle=linestyle, alpha=alpha)
+        ax2.axvline(x=pd.Timestamp(jour), color=color, linestyle=linestyle, alpha=alpha)
 
     plt.tight_layout()
     plt.savefig(PLOT_FILE)
