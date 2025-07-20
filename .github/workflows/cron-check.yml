@@ -39,8 +39,8 @@ jobs:
           set -x
           git config --local user.name "GitHub Actions"
           git config --local user.email "actions@github.com"
-          git add signatures.tsv
-          git diff --cached --quiet || git commit -m "Update signatures.tsv"
+          git add signatures.tsv signatures_plot.png
+          git diff --cached --quiet || git commit -m "Update signatures.tsv and plot"
           # Push avec token dans l'URL
           git push https://x-access-token:${GITHUB_TOKEN}@github.com/francois-lecoquierre/duplomb_dans_l_aile.git HEAD
         env:
