@@ -1,5 +1,9 @@
 name: Check Website Every 10 Minutes
 
+# This workflow checks a website every 10 minutes and runs a Python script to process data.
+# It also commits signatures.tsv to the repo
+
+
 on:
   schedule:
     - cron: '*/10 * * * *'  # Toutes les 10 minutes (UTC)
@@ -30,3 +34,14 @@ jobs:
           path: |
             signatures.tsv
             signatures_plot.png
+
+      - name: Commit signatures.tsv
+        run: |
+          git config --local user.name "GitHub Actions"
+          git config --local user.email "actions@github.com"
+          git add signatures.tsv
+          git commit -m "Update signatures.tsv"
+          git push
+
+
+
