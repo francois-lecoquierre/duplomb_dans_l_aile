@@ -75,6 +75,8 @@ def plot_data_2():
     # Dans ce deuxième cas, on utilise pandas pour lire le fichier CSV. On créé deux plots (un haut un bas, partageant les X) : un pour le nombre de signatures, et un pour l'évolution du nombre de signatures.
     df = pd.read_csv(CSV_FILE, sep=",")
     df['timestamp'] = pd.to_datetime(df['timestamp'])
+    # Ajouter 2h à à chaque timestamp pour le fuseau horaire (UTC+2)
+    df['timestamp'] = df['timestamp'] + timedelta(hours=2)
     df['signatures'] = df['signatures'].astype(int)
     # On récupère la dernière date et le dernier compte pour le header du graphique
     last_date = df['timestamp'].max() # format : 2025-07-18T15:10:03.294914
