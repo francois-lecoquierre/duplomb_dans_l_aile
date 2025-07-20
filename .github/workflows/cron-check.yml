@@ -10,6 +10,11 @@ on:
   workflow_dispatch:  # Permet de le lancer manuellement aussi
 
 
+permissions:  
+  contents: write  # Nécessaire pour pouvoir pousser les modifications dans le dépôt
+  identities: read  # Nécessaire pour lire les entités d'identification (comme le token GITHUB_TOKEN)
+  
+
 
 
 jobs:
