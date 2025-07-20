@@ -63,9 +63,9 @@ def save_data(timestamp, count):
         if not file_exists:
             writer.writerow(["timestamp", "signatures"])
         writer.writerow([timestamp, count])
-    # Archive the CSV file
-    with open(CSV_FILE, "r") as f:
-        data = f.read()
+    # # Archive the CSV file
+    # with open(CSV_FILE, "r") as f:
+    #     data = f.read()
     # with open(csv_archive_file, "w") as f:
     #     f.write(data)
 
