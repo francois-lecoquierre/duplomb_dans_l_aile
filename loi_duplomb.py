@@ -3,6 +3,7 @@
 import requests
 import time
 import matplotlib.pyplot as plt
+from matplotlib.ticker import ScalarFormatter
 from bs4 import BeautifulSoup
 from datetime import datetime
 import csv
@@ -75,6 +76,16 @@ def plot_data_2():
     df = pd.read_csv(CSV_FILE, sep=",")
     df['timestamp'] = pd.to_datetime(df['timestamp'])
     df['signatures'] = df['signatures'].astype(int)
+    # On récupère la dernière date et le dernier compte pour le header du graphique
+    last_date = df['timestamp'].max() # format : 2025-07-18T15:10:03.294914
+    last_count = df['signatures'].max()
+    # On extrait le jour, le mois et l'année, ainsi que l'heure et minutes (sans secondes et décimales)
+    last_date_str = last_date.strftime("%d/%m/%Y")  # Format jour/mois/année
+    last_time_str = last_date.strftime("%H:%M")  # Format heure:minute
+    last_count_str = f"{last_count:,}"  # Format avec des virgules pour les milliers
+    title = f"Nombre de signatures\n(dernière mise à jour : {last_date_str} à {last_time_str} : {last_count_str} signatures)"
+
+
     # On ajoute une colonne pour l'évolution du nombre de signatures, une colonne pour le temps écoulé et une colonne pour le nombre de signaturs par minute
     df['evolution'] = df['signatures'].diff().fillna(0)
     df['time_elapsed'] = (df['timestamp'] - df['timestamp'].min()).dt.total_seconds()
@@ -86,28 +97,29 @@ def plot_data_2():
     fig, (ax1, ax2) = plt.subplots(2, figsize=(10, 8), sharex=True)
     # Premier graphique : nombre de signatures
     ax1.plot(df['timestamp'], df['signatures'], marker='o', color='blue')
-    ax1.set_title("Nombre de signatures")
+    ax1.set_title(title)
     ax1.set_ylabel("Signatures")
     ax1.grid(True)
     # Y from 0 à max + 10%
     ax1.set_ylim(0, df['signatures'].max() * 1.1)
-    # Add vertical text below each point, grey background
-    show_labels = False  # Si True, on affiche les labels, sinon non
-    if show_labels:
-        for i, row in df.iterrows():
-            y = row['signatures'] - 0.05 * df['signatures'].max()  # Positionner le texte un peu en dessous du point
-            # On aligne sur le point
-            ax1.text(row['timestamp'], y, f"{row['signatures']}", ha='center', va='top', rotation=-90, fontsize=8, bbox=dict(facecolor='lightgrey', alpha=1))
-    show_last_label = True  # Si True, on affiche le dernier label, sinon non
-    if show_last_label:
-        last_row = df.iloc[-1]
-        y = last_row['signatures'] - 0.05 * df['signatures'].max()
-        ax1.text(last_row['timestamp'], y, f"{last_row['signatures']}", ha='center', va='top', rotation=-90, fontsize=8, bbox=dict(facecolor='lightgrey', alpha=1))
+    # # Add vertical text below each point, grey background
+    # show_labels = False  # Si True, on affiche les labels, sinon non
+    # if show_labels:
+    #     for i, row in df.iterrows():
+    #         y = row['signatures'] - 0.05 * df['signatures'].max()  # Positionner le texte un peu en dessous du point
+    #         # On aligne sur le point
+    #         ax1.text(row['timestamp'], y, f"{row['signatures']}", ha='center', va='top', rotation=-90, fontsize=8, bbox=dict(facecolor='lightgrey', alpha=1))
+    # show_last_label = True  # Si True, on affiche le dernier label, sinon non
+    # if show_last_label:
+    #     last_row = df.iloc[-1]
+    #     y = last_row['signatures'] - 0.05 * df['signatures'].max()
+    #     ax1.text(last_row['timestamp'], y, f"{last_row['signatures']}", ha='center', va='top', rotation=-90, fontsize=8, bbox=dict(facecolor='lightgrey', alpha=1))
     
     # Y labels: nombres entiers (pas de notation scientifique)
-    ax1.yaxis.get_major_locator().set_params(integer=True)
-        
-    
+    ax1.yaxis.set_major_formatter(ScalarFormatter(useMathText=False))
+    ax1.ticklabel_format(axis='y', style='plain')
+
+
     
     # Deuxième graphique : évolution du nombre de signatures (signatures par minute depuis le dernier point)
     # Ajout de la colonne timestamp_start pour le graphique, afin de tracer le début du rectangle
@@ -123,8 +135,6 @@ def plot_data_2():
     ax2.grid(True)
     # Y from 0 to max + 10%
     ax2.set_ylim(0, df['signatures_per_seconde_since_last_point'].max() * 1.1)
-
-
 
     plt.tight_layout()
     plt.savefig(PLOT_FILE)
