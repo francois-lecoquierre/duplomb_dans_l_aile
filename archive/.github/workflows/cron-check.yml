@@ -1,0 +1,32 @@
+name: Check Website Every 10 Minutes
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'  # Toutes les 10 minutes (UTC)
+  workflow_dispatch:  # Permet de le lancer manuellement aussi
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Run loi_duplomb.py
+        run: python loi_duplomb.py
+
+      - name: Upload output files
+        uses: actions/upload-artifact@v4
+        with:
+          name: output-files
+          path: |
+            signatures.tsv
+            signatures_plot.png
