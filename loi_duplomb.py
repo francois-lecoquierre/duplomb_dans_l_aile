@@ -139,6 +139,17 @@ def plot_data_2():
     # Y from 0 to max + 10%
     ax2.set_ylim(0, df['signatures_per_seconde_since_last_point'].max() * 1.1)
 
+    # X labels : format date et heure : "%d/%m\n%H:%M"
+    ax2.xaxis.set_major_formatter(mdates.DateFormatter('%d/%m\n%H:%M'))
+    plt.setp(ax2.xaxis.get_majorticklabels())
+
+    # X axis limits : from first to last timestamp + 5% each side
+    first_timestamp = df['timestamp'].min()
+    last_timestamp = df['timestamp'].max()
+    delta_in_seconds = (last_timestamp - first_timestamp).total_seconds()
+    delta = timedelta(seconds=delta_in_seconds * 0.1)  # 10% of the total duration
+    ax1.set_xlim(first_timestamp - delta, last_timestamp + delta)
+    ax2.set_xlim(first_timestamp - delta, last_timestamp + delta)
 
     # Pour les deux graphes, on ajoute une ligne verticale en pointillés à chaque changement de jour
     # Détermination des jours uniques
@@ -154,6 +165,9 @@ def plot_data_2():
     for jour in jours_uniques:
         ax1.axvline(x=pd.Timestamp(jour), color=color, linestyle=linestyle, alpha=alpha)
         ax2.axvline(x=pd.Timestamp(jour), color=color, linestyle=linestyle, alpha=alpha)
+
+    
+
 
     plt.tight_layout()
     plt.savefig(PLOT_FILE)
